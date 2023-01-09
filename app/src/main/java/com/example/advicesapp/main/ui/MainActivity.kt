@@ -1,8 +1,8 @@
-package com.example.advicesapp
+package com.example.advicesapp.main.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.advicesapp.ui.main.SectionsPagerAdapter
+import com.example.advicesapp.R
 import com.example.advicesapp.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
 

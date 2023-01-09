@@ -1,4 +1,4 @@
-package com.example.advicesapp.ui.main
+package com.example.advicesapp.main.ui
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
