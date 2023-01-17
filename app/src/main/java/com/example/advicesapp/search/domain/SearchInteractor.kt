@@ -1,0 +1,6 @@
+package com.example.advicesapp.search.domain
+
+interface SearchInteractor {
+    suspend fun advices(query: String): SearchAdviceResult
+    suspend fun randomAdvice(): SearchAdviceResult
+}

@@ -3,4 +3,7 @@
     <string name="tab_text_1">History</string>
     <string name="tab_text_2">Search</string>
     <string name="tab_text_3">Favorites</string>
+
+    <string name="invalid_input_message">invalid input message</string>
+    <string name="service_error_message">service error message</string>
 </resources>

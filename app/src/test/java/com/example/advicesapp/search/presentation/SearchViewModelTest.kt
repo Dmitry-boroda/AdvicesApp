@@ -6,9 +6,13 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import com.example.advicesapp.R
+import com.example.advicesapp.search.data.ServiceException
+import com.example.advicesapp.search.domain.Advice
+import com.example.advicesapp.search.domain.SearchAdviceResult
+import com.example.advicesapp.search.domain.SearchInteractor
 
 class SearchViewModelTest {
-    lateinit var
 
     private lateinit var interactor: FakeInteractor
     private lateinit var communication: FakeCommunication
@@ -62,7 +66,7 @@ class SearchViewModelTest {
         assertEquals(1, validation.isValidCallList.size)
         assertEquals("a", validation.isValidCallList[0])
         assertEquals(1, validation.mapCallList.size)
-        assertEquals(SearchUiState.Progress, communication.statesList[0])
+        assertEquals(SearchUiState.Progress(), communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals("b", interactor.queryList[0])
         assertEquals(1, interactor.queryList.size)
@@ -91,7 +95,7 @@ class SearchViewModelTest {
         assertEquals(1, validation.isValidCallList.size)
         assertEquals("a", validation.isValidCallList[0])
         assertEquals(1, validation.mapCallList.size)
-        assertEquals(SearchUiState.Progress, communication.statesList[0])
+        assertEquals(SearchUiState.Progress(), communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals("b", interactor.queryList[0])
         assertEquals(1, interactor.queryList.size)
@@ -118,7 +122,7 @@ class SearchViewModelTest {
 
         viewModel.randomAdvice()
 
-        assertEquals(SearchUiState.Progress, communication.statesList[0])
+        assertEquals(SearchUiState.Progress(), communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals(1, interactor.randomAdviceCallCount)
         assertEquals(0, interactor.queryList.size)
@@ -141,7 +145,7 @@ class SearchViewModelTest {
 
         viewModel.randomAdvice()
 
-        assertEquals(SearchUiState.Progress, communication.statesList[0])
+        assertEquals(SearchUiState.Progress(), communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals(0, interactor.queryList.size)
         assertEquals(1, interactor.randomAdviceCallCount)
@@ -166,14 +170,14 @@ private class FakeInteractor : SearchInteractor {
 
     override suspend fun advices(query: String): SearchAdviceResult {
         queryList.add(query)
-        return searchAdviceResultByQuery
+        return searchAdviceResultByQuery!!
     }
 
     var randomAdviceCallCount = 0
     var searchAdviceRandomResult: SearchAdviceResult? = null
     override suspend fun randomAdvice(): SearchAdviceResult {
         randomAdviceCallCount++
-        return searchAdviceRandomResult
+        return searchAdviceRandomResult!!
     }
 }
 
@@ -197,7 +201,7 @@ private class FakeDispatchers : DispatchersList {
     }
 }
 
-private class FakeValidation : Valdation {
+private class FakeValidation : Validation {
 
     val isValidCallList = ArrayList<String>()
     var isValid: Boolean? = null
