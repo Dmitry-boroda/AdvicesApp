@@ -6,4 +6,5 @@
 
     <string name="invalid_input_message">invalid input message</string>
     <string name="service_error_message">service error message</string>
+    <string name="no_internet">no internet</string>
 </resources>

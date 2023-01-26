@@ -7,15 +7,14 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import com.example.advicesapp.R
-import com.example.advicesapp.search.data.ServiceException
-import com.example.advicesapp.search.domain.Advice
-import com.example.advicesapp.search.domain.SearchAdviceResult
-import com.example.advicesapp.search.domain.SearchInteractor
+import com.example.advicesapp.search.domain.*
 
 class SearchViewModelTest {
 
     private lateinit var interactor: FakeInteractor
+    private lateinit var changeInteractor: FakeChangeInteractor
     private lateinit var communication: FakeCommunication
+    private lateinit var communicationFavorite: FakeCommunicationFavorites
     private lateinit var dispatchers: FakeDispatchers
     private lateinit var validation: FakeValidation
     private lateinit var resources: FakeResources
@@ -24,14 +23,18 @@ class SearchViewModelTest {
     @Before
     fun setUp() {
         interactor = FakeInteractor()
+        changeInteractor = FakeChangeInteractor()
         communication = FakeCommunication()
+        communicationFavorite = FakeCommunicationFavorites()
         dispatchers = FakeDispatchers()
         validation = FakeValidation()
         resources = FakeResources()
         viewModel =
             SearchViewModel(
                 interactor = interactor,
+                changeInteractor = changeInteractor,
                 communication = communication,
+                communicationFavorite = communicationFavorite,
                 dispatchers = dispatchers,
                 validation = validation,
                 resources = resources
@@ -59,14 +62,14 @@ class SearchViewModelTest {
         validation.isValid = true
         validation.mapResult = "b"
         interactor.searchAdviceResultByQuery =
-            SearchAdviceResult.Error(exception = ServiceException())
+            SearchAdviceResult.Error(exception = DomainException.ServiceUnavailable())
 
         viewModel.advices(query = "a")
 
         assertEquals(1, validation.isValidCallList.size)
         assertEquals("a", validation.isValidCallList[0])
         assertEquals(1, validation.mapCallList.size)
-        assertEquals(SearchUiState.Progress(), communication.statesList[0])
+        assertEquals(SearchUiState.Progress, communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals("b", interactor.queryList[0])
         assertEquals(1, interactor.queryList.size)
@@ -95,7 +98,7 @@ class SearchViewModelTest {
         assertEquals(1, validation.isValidCallList.size)
         assertEquals("a", validation.isValidCallList[0])
         assertEquals(1, validation.mapCallList.size)
-        assertEquals(SearchUiState.Progress(), communication.statesList[0])
+        assertEquals(SearchUiState.Progress, communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals("b", interactor.queryList[0])
         assertEquals(1, interactor.queryList.size)
@@ -118,11 +121,11 @@ class SearchViewModelTest {
     fun `random advice result error`() = runBlocking {
 
         interactor.searchAdviceRandomResult =
-            SearchAdviceResult.Error(exception = ServiceException())
+            SearchAdviceResult.Error(exception = DomainException.ServiceUnavailable())
 
         viewModel.randomAdvice()
 
-        assertEquals(SearchUiState.Progress(), communication.statesList[0])
+        assertEquals(SearchUiState.Progress, communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals(1, interactor.randomAdviceCallCount)
         assertEquals(0, interactor.queryList.size)
@@ -145,7 +148,7 @@ class SearchViewModelTest {
 
         viewModel.randomAdvice()
 
-        assertEquals(SearchUiState.Progress(), communication.statesList[0])
+        assertEquals(SearchUiState.Progress, communication.statesList[0])
         assertEquals(1, dispatchers.ioCallCount)
         assertEquals(0, interactor.queryList.size)
         assertEquals(1, interactor.randomAdviceCallCount)
@@ -162,6 +165,17 @@ class SearchViewModelTest {
         )
         assertEquals(2, communication.statesList.size)
     }
+
+    @Test
+    fun `change status favorites`() = runBlocking {
+
+        viewModel.changeFavorite(id = 1)
+
+        assertEquals(1, communicationFavorite.stateChangeList.size)
+        assertEquals(1, dispatchers.ioCallCount)
+        assertEquals(1, changeInteractor.idList.size)
+    }
+
 }
 
 private class FakeInteractor : SearchInteractor {
@@ -181,10 +195,24 @@ private class FakeInteractor : SearchInteractor {
     }
 }
 
+private class FakeChangeInteractor() : ChangeInteractor {
+    val idList = ArrayList<Int>()
+    override suspend fun changeFavorite(id: Int) {
+        idList.add(id)
+    }
+}
+
 private class FakeCommunication : SearchCommunication {
     val statesList = ArrayList<SearchUiState>()
     override fun map(data: SearchUiState) {
         statesList.add(data)
+    }
+}
+
+private class FakeCommunicationFavorites() : ChangeFavoriteCommunication {
+    val stateChangeList = ArrayList<Int>()
+    override fun map(id: Int) {
+        stateChangeList.add(id)
     }
 }
 
