@@ -13,31 +13,40 @@ class SearchViewModelTest {
 
     private lateinit var interactor: FakeInteractor
     private lateinit var changeInteractor: FakeChangeInteractor
-    private lateinit var communication: FakeCommunication
+    private lateinit var communication: FakeSearchCommunication
     private lateinit var communicationFavorite: FakeCommunicationFavorites
     private lateinit var dispatchers: FakeDispatchers
     private lateinit var validation: FakeValidation
     private lateinit var resources: FakeResources
     private lateinit var viewModel: SearchViewModel
+    private lateinit var handleRequest: HandleRequest
 
     @Before
     fun setUp() {
         interactor = FakeInteractor()
         changeInteractor = FakeChangeInteractor()
-        communication = FakeCommunication()
+        communication = FakeSearchCommunication()
         communicationFavorite = FakeCommunicationFavorites()
         dispatchers = FakeDispatchers()
         validation = FakeValidation()
         resources = FakeResources()
+        handleRequest = HandleRequest.Base(
+            communication= communication,
+            communicationFavorite = communicationFavorite,
+            changeInteractor = changeInteractor,
+            dispatchers = dispatchers,
+            resources = resources,
+        )
         viewModel =
             SearchViewModel(
+                handleRequest = handleRequest,
                 interactor = interactor,
                 changeInteractor = changeInteractor,
                 communication = communication,
                 communicationFavorite = communicationFavorite,
                 dispatchers = dispatchers,
                 validation = validation,
-                resources = resources
+                resources = resources,
             )
     }
 
@@ -202,7 +211,7 @@ private class FakeChangeInteractor() : ChangeInteractor {
     }
 }
 
-private class FakeCommunication : SearchCommunication {
+private class FakeSearchCommunication : SearchCommunication {
     val statesList = ArrayList<SearchUiState>()
     override fun map(data: SearchUiState) {
         statesList.add(data)
