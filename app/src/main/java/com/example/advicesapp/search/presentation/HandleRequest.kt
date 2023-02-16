@@ -1,6 +1,7 @@
 package com.example.advicesapp.search.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.example.advicesapp.search.data.HandelError
 import com.example.advicesapp.search.domain.Advice
 import com.example.advicesapp.search.domain.ChangeInteractor
 import com.example.advicesapp.search.domain.SearchAdviceResult
@@ -18,7 +19,7 @@ interface HandleRequest {
         private val resources: ProvideResources,
         private val mapper: SearchAdviceResult.Mapper<SearchUiState> = UiMapper(
             Advice.Mapper.Base(),
-            resources
+            HandelError.Base(resources)
         )
     ) : BaseViewModel(communicationFavorite, changeInteractor, dispatchers), HandleRequest {
         override fun handle(block: suspend () -> SearchAdviceResult) {
