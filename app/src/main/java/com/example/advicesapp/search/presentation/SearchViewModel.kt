@@ -1,5 +1,6 @@
 package com.example.advicesapp.search.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.example.advicesapp.R
 import com.example.advicesapp.search.domain.*
 
@@ -13,15 +14,16 @@ class SearchViewModel(
     private val validation: Validation,
     private val resources: ProvideResources,
 ) : BaseViewModel(communicationFavorite, changeInteractor, dispatchers) {
+
     fun advices(query: String) {
-        if (validation.isValid(query)) handleRequest.handle {
+        if (validation.isValid(query)) handleRequest.handle(viewModelScope) {
             interactor.advices(validation.map(query))
         }
         else
             communication.map(SearchUiState.Error(resources.string(R.string.invalid_input_message)))
     }
 
-    fun randomAdvice() = handleRequest.handle {
+    fun randomAdvice() = handleRequest.handle(viewModelScope) {
         interactor.randomAdvice()
     }
 }
