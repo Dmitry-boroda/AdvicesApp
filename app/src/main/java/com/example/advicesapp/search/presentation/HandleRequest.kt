@@ -8,11 +8,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-interface HandleRequest {
+interface HandleRequest<T> {
 
-    fun handle(viewModelScope: CoroutineScope, block: suspend () -> SearchAdviceResult)
+    fun handle(viewModelScope: CoroutineScope, block: suspend () -> T)
 
-    class Base(
+    class HandleSearchRequest(
         private val communication: SearchCommunication,
         private val dispatchers: DispatchersList,
         private val resources: ProvideResources,
@@ -20,7 +20,7 @@ interface HandleRequest {
             Advice.Mapper.Base(),
             HandelError.Base(resources)
         )
-    ) : HandleRequest {
+    ) : HandleRequest<SearchAdviceResult> {
 
         override fun handle(
             viewModelScope: CoroutineScope,

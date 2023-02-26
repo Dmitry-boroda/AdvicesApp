@@ -1,33 +1,19 @@
 package com.example.advicesapp.search.presentation
 
-import androidx.lifecycle.viewModelScope
-import com.example.advicesapp.R
 import com.example.advicesapp.search.domain.*
 
 class SearchViewModel(
-    private val handleRequest: HandleRequest,
+    private val handleRequest: HandleRequest<SearchAdviceResult>,
     private val interactor: SearchInteractor,
-    changeInteractor: ChangeInteractor,
     private val communication: SearchCommunication,
-    communicationFavorite: ChangeFavoriteCommunication,
+    communicationFavorite: ChangeFavoriteCommunication,// TODO: inherit
     dispatchers: DispatchersList,
-    private val validation: Validation,
-    private val resources: ProvideResources,
-) : BaseViewModel(communicationFavorite, changeInteractor, dispatchers) {
+    private val validation: Valid,
+) : BaseViewModel(communicationFavorite, interactor, dispatchers) {
 
-    fun advices(query: String) {
-        if (validation.isValid(query)) handleRequest.handle(viewModelScope) {
-            interactor.advices(validation.map(query))
-        }
-        else
-            communication.map(SearchUiState.Error(resources.string(R.string.invalid_input_message)))
+    fun advices(query: String) = validation.isValid(query) { filteredQuery ->
+        handle(handleRequest) { interactor.advices(filteredQuery) }
     }
 
-    fun randomAdvice() = handleRequest.handle(viewModelScope) {
-        interactor.randomAdvice()
-    }
-}
-
-interface ChangeFavorite {
-    fun changeFavorite(id: Int)
+    fun randomAdvice() = handle(handleRequest) { interactor.randomAdvice() }
 }

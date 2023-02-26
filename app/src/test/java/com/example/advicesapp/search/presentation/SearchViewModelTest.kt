@@ -12,26 +12,24 @@ import com.example.advicesapp.search.domain.*
 class SearchViewModelTest {
 
     private lateinit var interactor: FakeInteractor
-    private lateinit var changeInteractor: FakeChangeInteractor
     private lateinit var communication: FakeSearchCommunication
     private lateinit var communicationFavorite: FakeCommunicationFavorites
     private lateinit var dispatchers: FakeDispatchers
     private lateinit var validation: FakeValidation
     private lateinit var resources: FakeResources
     private lateinit var viewModel: SearchViewModel
-    private lateinit var handleRequest: HandleRequest
+    private lateinit var handleRequest: HandleRequest<SearchAdviceResult>
 
     @Before
     fun setUp() {
         interactor = FakeInteractor()
-        changeInteractor = FakeChangeInteractor()
         communication = FakeSearchCommunication()
         communicationFavorite = FakeCommunicationFavorites()
         dispatchers = FakeDispatchers()
         validation = FakeValidation()
         resources = FakeResources()
-        handleRequest = HandleRequest.Base(
-            communication= communication,
+        handleRequest = HandleRequest.HandleSearchRequest(
+            communication = communication,
             dispatchers = dispatchers,
             resources = resources,
         )
@@ -39,12 +37,10 @@ class SearchViewModelTest {
             SearchViewModel(
                 handleRequest = handleRequest,
                 interactor = interactor,
-                changeInteractor = changeInteractor,
                 communication = communication,
                 communicationFavorite = communicationFavorite,
                 dispatchers = dispatchers,
-                validation = validation,
-                resources = resources,
+                validation = Valid.Base(resources, communication, validation)
             )
     }
 
@@ -180,7 +176,7 @@ class SearchViewModelTest {
 
         assertEquals(1, communicationFavorite.stateChangeList.size)
         assertEquals(1, dispatchers.ioCallCount)
-        assertEquals(1, changeInteractor.idList.size)
+        assertEquals(1, interactor.idList.size)
     }
 
 }
@@ -200,9 +196,7 @@ private class FakeInteractor : SearchInteractor {
         randomAdviceCallCount++
         return searchAdviceRandomResult!!
     }
-}
 
-private class FakeChangeInteractor() : ChangeInteractor {
     val idList = ArrayList<Int>()
     override suspend fun changeFavorite(id: Int) {
         idList.add(id)

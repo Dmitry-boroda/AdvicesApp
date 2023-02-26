@@ -10,6 +10,10 @@ abstract class BaseViewModel(
     private val changeInteractor: ChangeInteractor,
     private val dispatchers: DispatchersList
 ) : ViewModel(), ChangeFavorite {
+
+    protected fun <T> handle(handleRequest: HandleRequest<T>, block: suspend () -> T) =
+        handleRequest.handle(viewModelScope, block)
+
     override fun changeFavorite(id: Int) {
         communication.map(id)
         viewModelScope.launch(dispatchers.io()) {
