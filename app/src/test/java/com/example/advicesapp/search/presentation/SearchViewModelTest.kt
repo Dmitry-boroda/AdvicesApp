@@ -32,8 +32,6 @@ class SearchViewModelTest {
         resources = FakeResources()
         handleRequest = HandleRequest.Base(
             communication= communication,
-            communicationFavorite = communicationFavorite,
-            changeInteractor = changeInteractor,
             dispatchers = dispatchers,
             resources = resources,
         )
