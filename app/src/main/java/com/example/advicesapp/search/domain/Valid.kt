@@ -1,6 +1,9 @@
-package com.example.advicesapp.search.presentation
+package com.example.advicesapp.search.domain
 
 import com.example.advicesapp.R
+import com.example.advicesapp.search.presentation.ProvideResources
+import com.example.advicesapp.search.presentation.SearchCommunication
+import com.example.advicesapp.search.presentation.SearchUiState
 
 interface Valid {
 

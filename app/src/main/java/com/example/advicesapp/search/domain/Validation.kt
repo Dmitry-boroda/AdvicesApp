@@ -1,4 +1,4 @@
-package com.example.advicesapp.search.presentation
+package com.example.advicesapp.search.domain
 
 interface Validation {
     fun isValid(query: String): Boolean

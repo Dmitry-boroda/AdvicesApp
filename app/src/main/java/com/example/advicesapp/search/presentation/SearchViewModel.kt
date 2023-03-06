@@ -1,5 +1,7 @@
 package com.example.advicesapp.search.presentation
 
+import com.example.advicesapp.core.presentation.BaseViewModel
+import com.example.advicesapp.core.presentation.ChangeFavoriteCommunication
 import com.example.advicesapp.search.domain.*
 
 class SearchViewModel(

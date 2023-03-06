@@ -7,6 +7,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import com.example.advicesapp.R
+import com.example.advicesapp.core.presentation.ChangeFavoriteCommunication
 import com.example.advicesapp.search.domain.*
 
 class SearchViewModelTest {

@@ -1,8 +1,10 @@
-package com.example.advicesapp.search.presentation
+package com.example.advicesapp.core.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.advicesapp.search.domain.ChangeInteractor
+import com.example.advicesapp.search.presentation.DispatchersList
+import com.example.advicesapp.search.presentation.HandleRequest
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel(
