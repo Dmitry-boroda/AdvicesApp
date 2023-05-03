@@ -1,5 +1,7 @@
 package com.example.advicesapp.core.presentation
 
+import com.example.advicesapp.search.presentation.AdviceUi
+
 interface ChangeFavoriteCommunication {
-    fun map(id: Int)
+    fun map(item: AdviceUi)
 }

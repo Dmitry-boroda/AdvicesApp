@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.example.advicesapp.search.presentation.Mapper
 
-interface Communication {
+interface Communication<T : Any> {
     interface Observe<T : Any> {
         fun observe(owner: LifecycleOwner, observer: Observer<T>) = Unit
     }

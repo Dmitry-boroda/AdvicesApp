@@ -1,5 +1,8 @@
 package com.example.advicesapp.search.presentation
 
-interface SearchCommunication {
-    fun map(data: SearchUiState)
+import com.example.advicesapp.core.presentation.Communication
+
+interface SearchCommunication : Communication.Mutable<SearchUiState> {
+
+    class Base : Communication.Abstract<SearchUiState>(), SearchCommunication
 }

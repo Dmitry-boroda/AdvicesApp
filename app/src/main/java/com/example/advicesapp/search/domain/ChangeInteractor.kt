@@ -1,6 +1,7 @@
 package com.example.advicesapp.search.domain
 
-interface ChangeInteractor {
+import com.example.advicesapp.search.presentation.AdviceUi
 
-    suspend fun changeFavorite(id: Int)
+interface ChangeInteractor {
+    suspend fun changeFavorite(item: AdviceUi)
 }

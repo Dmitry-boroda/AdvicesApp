@@ -91,6 +91,7 @@ class SearchViewModelTest {
                 list = listOf<Advice>(
                     Advice(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = false
                     )
@@ -112,6 +113,7 @@ class SearchViewModelTest {
                 list = listOf<AdviceUi>(
                     AdviceUi(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = false
                     )
@@ -144,6 +146,7 @@ class SearchViewModelTest {
                 list = listOf<Advice>(
                     Advice(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = true
                     )
@@ -161,6 +164,7 @@ class SearchViewModelTest {
                 list = listOf<AdviceUi>(
                     AdviceUi(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = true
                     )
@@ -173,7 +177,14 @@ class SearchViewModelTest {
     @Test
     fun `change status favorites`() = runBlocking {
 
-        viewModel.changeFavorite(id = 1)
+        viewModel.changeFavorite(
+            item = AdviceUi(
+                id = 1,
+                query = "x",
+                text = "x",
+                isFavorite = false
+            )
+        )
 
         assertEquals(1, communicationFavorite.stateChangeList.size)
         assertEquals(1, dispatchers.ioCallCount)
@@ -198,9 +209,9 @@ private class FakeInteractor : SearchInteractor {
         return searchAdviceRandomResult!!
     }
 
-    val idList = ArrayList<Int>()
-    override suspend fun changeFavorite(id: Int) {
-        idList.add(id)
+    val idList = ArrayList<AdviceUi>()
+    override suspend fun changeFavorite(item: AdviceUi) {
+        idList.add(item)
     }
 }
 
@@ -212,9 +223,9 @@ private class FakeSearchCommunication : SearchCommunication {
 }
 
 private class FakeCommunicationFavorites() : ChangeFavoriteCommunication {
-    val stateChangeList = ArrayList<Int>()
-    override fun map(id: Int) {
-        stateChangeList.add(id)
+    val stateChangeList = ArrayList<AdviceUi>()
+    override fun map(item: AdviceUi) {
+        stateChangeList.add(item)
     }
 }
 

@@ -1,40 +1,48 @@
 package com.example.advicesapp.search.presentation
 
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.KeyEvent
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ProgressBar
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.advicesapp.R
+import com.example.advicesapp.core.presentation.BaseFragment
+import com.example.advicesapp.databinding.SearchFragmentBinding
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
-class SearchFragment : Fragment() {
+class SearchFragment : BaseFragment<SearchViewModel>() {
 
-    private lateinit var viewModel: SearchViewModel
+    override val viewModelClass = SearchViewModel::class.java
+    override val layoutId = R.layout.search_fragment
+
+    lateinit var binding: SearchFragmentBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding = SearchFragmentBinding.inflate(layoutInflater)
+
         val inputLayout = view.findViewById<TextInputLayout>(R.id.textInputLayout)
         val inputEditText = view.findViewById<TextInputEditText>(R.id.textInputEditText)
-        val randomButton = view.findViewById<Button>(R.id.random_button)
         val recyclerView = view.findViewById<RecyclerView>(R.id.searchRecycleView)
-        val process = view.findViewById<ProgressBar>(R.id.progressBar)
+        val adapter = SearchAdapter(object : ClickListener {
+            override fun click(item: AdviceUi) = viewModel.changeFavorite(item)
+        })
 
-        randomButton.setOnClickListener {
+        recyclerView.adapter = adapter
+
+        binding.randomButton.setOnClickListener {
             viewModel.randomAdvice()
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.search_fragment, container)
+        inputEditText.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                viewModel.advices(binding.textInputEditText.text.toString())
+                return@OnKeyListener true
+            }
+            false
+        })
+        viewModel.observe(this) {
+            it.show(binding, adapter)
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.example.advicesapp.core.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.advicesapp.search.domain.ChangeInteractor
+import com.example.advicesapp.search.presentation.AdviceUi
 import com.example.advicesapp.search.presentation.DispatchersList
 import com.example.advicesapp.search.presentation.HandleRequest
 import kotlinx.coroutines.launch
@@ -16,10 +17,10 @@ abstract class BaseViewModel(
     protected fun <T> handle(handleRequest: HandleRequest<T>, block: suspend () -> T) =
         handleRequest.handle(viewModelScope, block)
 
-    override fun changeFavorite(id: Int) {
-        communication.map(id)
+    override fun changeFavorite(item: AdviceUi) {
+        communication.map(item)
         viewModelScope.launch(dispatchers.io()) {
-            changeInteractor.changeFavorite(id)
+            changeInteractor.changeFavorite(item)
         }
     }
 }
