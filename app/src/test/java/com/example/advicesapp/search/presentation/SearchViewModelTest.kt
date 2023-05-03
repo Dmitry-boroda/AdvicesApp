@@ -6,31 +6,42 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import com.example.advicesapp.R
+import com.example.advicesapp.core.presentation.ChangeFavoriteCommunication
+import com.example.advicesapp.search.domain.*
 
 class SearchViewModelTest {
-    lateinit var
 
     private lateinit var interactor: FakeInteractor
-    private lateinit var communication: FakeCommunication
+    private lateinit var communication: FakeSearchCommunication
+    private lateinit var communicationFavorite: FakeCommunicationFavorites
     private lateinit var dispatchers: FakeDispatchers
     private lateinit var validation: FakeValidation
     private lateinit var resources: FakeResources
     private lateinit var viewModel: SearchViewModel
+    private lateinit var handleRequest: HandleRequest<SearchAdviceResult>
 
     @Before
     fun setUp() {
         interactor = FakeInteractor()
-        communication = FakeCommunication()
+        communication = FakeSearchCommunication()
+        communicationFavorite = FakeCommunicationFavorites()
         dispatchers = FakeDispatchers()
         validation = FakeValidation()
         resources = FakeResources()
+        handleRequest = HandleRequest.HandleSearchRequest(
+            communication = communication,
+            dispatchers = dispatchers,
+            resources = resources,
+        )
         viewModel =
             SearchViewModel(
+                handleRequest = handleRequest,
                 interactor = interactor,
                 communication = communication,
+                communicationFavorite = communicationFavorite,
                 dispatchers = dispatchers,
-                validation = validation,
-                resources = resources
+                validation = Valid.Base(resources, communication, validation)
             )
     }
 
@@ -55,7 +66,7 @@ class SearchViewModelTest {
         validation.isValid = true
         validation.mapResult = "b"
         interactor.searchAdviceResultByQuery =
-            SearchAdviceResult.Error(exception = ServiceException())
+            SearchAdviceResult.Error(exception = DomainException.ServiceUnavailable())
 
         viewModel.advices(query = "a")
 
@@ -80,6 +91,7 @@ class SearchViewModelTest {
                 list = listOf<Advice>(
                     Advice(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = false
                     )
@@ -101,6 +113,7 @@ class SearchViewModelTest {
                 list = listOf<AdviceUi>(
                     AdviceUi(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = false
                     )
@@ -114,7 +127,7 @@ class SearchViewModelTest {
     fun `random advice result error`() = runBlocking {
 
         interactor.searchAdviceRandomResult =
-            SearchAdviceResult.Error(exception = ServiceException())
+            SearchAdviceResult.Error(exception = DomainException.ServiceUnavailable())
 
         viewModel.randomAdvice()
 
@@ -133,6 +146,7 @@ class SearchViewModelTest {
                 list = listOf<Advice>(
                     Advice(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = true
                     )
@@ -150,6 +164,7 @@ class SearchViewModelTest {
                 list = listOf<AdviceUi>(
                     AdviceUi(
                         id = 1,
+                        query = "x",
                         text = "x",
                         isFavorite = true
                     )
@@ -158,6 +173,24 @@ class SearchViewModelTest {
         )
         assertEquals(2, communication.statesList.size)
     }
+
+    @Test
+    fun `change status favorites`() = runBlocking {
+
+        viewModel.changeFavorite(
+            item = AdviceUi(
+                id = 1,
+                query = "x",
+                text = "x",
+                isFavorite = false
+            )
+        )
+
+        assertEquals(1, communicationFavorite.stateChangeList.size)
+        assertEquals(1, dispatchers.ioCallCount)
+        assertEquals(1, interactor.idList.size)
+    }
+
 }
 
 private class FakeInteractor : SearchInteractor {
@@ -166,21 +199,33 @@ private class FakeInteractor : SearchInteractor {
 
     override suspend fun advices(query: String): SearchAdviceResult {
         queryList.add(query)
-        return searchAdviceResultByQuery
+        return searchAdviceResultByQuery!!
     }
 
     var randomAdviceCallCount = 0
     var searchAdviceRandomResult: SearchAdviceResult? = null
     override suspend fun randomAdvice(): SearchAdviceResult {
         randomAdviceCallCount++
-        return searchAdviceRandomResult
+        return searchAdviceRandomResult!!
+    }
+
+    val idList = ArrayList<AdviceUi>()
+    override suspend fun changeFavorite(item: AdviceUi) {
+        idList.add(item)
     }
 }
 
-private class FakeCommunication : SearchCommunication {
+private class FakeSearchCommunication : SearchCommunication {
     val statesList = ArrayList<SearchUiState>()
     override fun map(data: SearchUiState) {
         statesList.add(data)
+    }
+}
+
+private class FakeCommunicationFavorites() : ChangeFavoriteCommunication {
+    val stateChangeList = ArrayList<AdviceUi>()
+    override fun map(item: AdviceUi) {
+        stateChangeList.add(item)
     }
 }
 
@@ -197,7 +242,7 @@ private class FakeDispatchers : DispatchersList {
     }
 }
 
-private class FakeValidation : Valdation {
+private class FakeValidation : Validation {
 
     val isValidCallList = ArrayList<String>()
     var isValid: Boolean? = null

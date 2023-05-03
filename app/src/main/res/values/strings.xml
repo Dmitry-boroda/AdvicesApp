@@ -3,4 +3,12 @@
     <string name="tab_text_1">History</string>
     <string name="tab_text_2">Search</string>
     <string name="tab_text_3">Favorites</string>
+
+    <string name="invalid_input_message">invalid input message</string>
+    <string name="service_error_message">service error message</string>
+    <string name="no_internet">no internet</string>
+    <string name="general_title_search">What topic do you need advice on?</string>
+    <string name="search_hint">search</string>
+    <string name="text_between_search">OR</string>
+    <string name="show_random_advice">Show random advice</string>
 </resources>
